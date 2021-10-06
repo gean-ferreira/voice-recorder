@@ -5,6 +5,7 @@
   let mediaRecorder = null;
   let chunks = [];
   let status = false;
+  let recordings = [];
 
   if (navigator.mediaDevices) {
     console.log("getUserMedia supported.");
@@ -19,11 +20,26 @@
         };
 
         mediaRecorder.onstop = (e) => {
+          const clipName = prompt("Enter a name for your audio clip");
+
+          if (clipName === null || clipName === undefined || clipName === "") {
+            clipName = "";
+          }
+
           const blob = new Blob(chunks, { type: "audio/ogg; codecs-opus" });
           const audioURL = URL.createObjectURL(blob);
 
           chunks = [];
-          console.log("audioURL: " + audioURL);
+
+          recordings = [
+            ...recordings,
+            {
+              title: clipName,
+              audio: audioURL,
+            },
+          ];
+
+          console.log(recordings);
         };
       })
       .catch((err) => {
@@ -37,13 +53,15 @@
   function record() {
     mediaRecorder.start();
     status = true;
-    console.log("play button has been activated");
   }
 
   function stop() {
     mediaRecorder.stop();
     status = false;
-    console.log("stop button has been activated");
+  }
+
+  function deleteRecording(item) {
+    recordings = recordings.filter((i) => i !== item);
   }
 </script>
 
@@ -61,19 +79,22 @@
     {/if}
   </div>
 
-  <div>Doesn't have any audio stored.</div>
-
-  <div class="storage">
-    <span>Audio1</span>
-    <audio controls />
-    <Icon name="trash-fill" />
-  </div>
-
-  <div class="storage">
-    <span>Audio1</span>
-    <audio controls />
-    <Icon name="trash-fill" />
-  </div>
+  {#if recordings.length > 0}
+    {#each recordings as recording, i}
+      <div class="storage">
+        <span>{i + 1 + ": " + recording.title}</span>
+        <audio controls src={recording.audio} />
+        <Button
+          class="lixeira"
+          style="padding: 0px"
+          color=""
+          on:click={deleteRecording}><Icon name="trash-fill" /></Button
+        >
+      </div>
+    {/each}
+  {:else}
+    <div>Doesn't have any audio stored.</div>
+  {/if}
 </body>
 
 <style>
