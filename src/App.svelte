@@ -1,23 +1,35 @@
 <script>
+  const constrains = { audio: true };
   let mediaRecorder = null;
   let chunks = [];
 
-  const constrains = { audio: true };
-  navigator.mediaDevices.getUserMedia(constrains).then((stream) => {
-    mediaRecorder = new MediaRecorder(stream);
+  if (navigator.mediaDevices) {
+    console.log("getUserMedia supported.");
 
-    mediaRecorder.ondataavailable = (e) => {
-      chunks.push(e.data);
-    };
+    navigator.mediaDevices
+      .getUserMedia(constrains)
+      .then((stream) => {
+        mediaRecorder = new MediaRecorder(stream);
 
-    mediaRecorder.onstop = (e) => {
-      const blob = new Blob(chunks, { type: "audio/ogg; codecs-opus" });
-      const audioURL = URL.createObjectURL(blob);
+        mediaRecorder.ondataavailable = (e) => {
+          chunks.push(e.data);
+        };
 
-      chunks = [];
-      console.log("audioURL: " + audioURL);
-    };
-  });
+        mediaRecorder.onstop = (e) => {
+          const blob = new Blob(chunks, { type: "audio/ogg; codecs-opus" });
+          const audioURL = URL.createObjectURL(blob);
+
+          chunks = [];
+          console.log("audioURL: " + audioURL);
+        };
+      })
+      .catch((err) => {
+        alert(
+          "Permission denied. To use the recorder you will have to allow access to the microphone."
+        );
+        console.log("The fallowing error occurred: " + err);
+      });
+  }
 
   function record() {
     mediaRecorder.start();
@@ -40,8 +52,15 @@
     <span>Recording</span>
   </div>
 
+  <div>Doesn't have any audio stored.</div>
+
   <div class="storage">
-    <div>Doesn't have any audio stored.</div>
+    <span>Audio1</span>
+    <audio controls />
+    <button>Delete</button>
+  </div>
+
+  <div class="storage">
     <span>Audio1</span>
     <audio controls />
     <button>Delete</button>
@@ -54,5 +73,12 @@
     max-width: 45rem;
     margin: auto;
     text-align: center;
+    height: auto;
+  }
+  .storage {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    margin: 0.5rem;
   }
 </style>
