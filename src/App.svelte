@@ -1,9 +1,22 @@
 <script>
   let mediaRecorder = null;
+  let chunks = [];
 
   const constrains = { audio: true };
   navigator.mediaDevices.getUserMedia(constrains).then((stream) => {
     mediaRecorder = new MediaRecorder(stream);
+
+    mediaRecorder.ondataavailable = (e) => {
+      chunks.push(e.data);
+    };
+
+    mediaRecorder.onstop = (e) => {
+      const blob = new Blob(chunks, { type: "audio/ogg; codecs-opus" });
+      const audioURL = URL.createObjectURL(blob);
+
+      chunks = [];
+      console.log("audioURL: " + audioURL);
+    };
   });
 
   function record() {
@@ -40,11 +53,6 @@
     background-color: burlywood;
     max-width: 45rem;
     margin: auto;
-    text-align: center;
-  }
-  h1,
-  .buttons,
-  .storage {
     text-align: center;
   }
 </style>
