@@ -1,5 +1,6 @@
 <script>
-  import { Button, Icon } from "sveltestrap";
+  import AudioList from "./AudioList.svelte";
+  import { Button } from "sveltestrap";
 
   const constrains = { audio: true };
   let mediaRecorder = null;
@@ -65,8 +66,12 @@
   <h1>Voice recorder</h1>
 
   <div class="buttons">
-    <Button color="danger" on:click={record}>Play</Button>
-    <Button color="danger" on:click={stop}>Stop</Button>
+    <Button disabled={status === true} color="danger" on:click={record}
+      >Play</Button
+    >
+    <Button disabled={status === false} color="danger" on:click={stop}
+      >Stop</Button
+    >
 
     {#if status === false}
       <span>Waiting</span>
@@ -77,13 +82,11 @@
 
   {#if recordings.length > 0}
     {#each recordings as recording, i}
-      <div class="library">
-        <span class="title">{i + 1 + ": " + recording.title}</span>
-        <audio controls src={recording.audio} />
-        <button class="trash" on:click={deleteRecording(recording)}
-          ><Icon name="trash-fill" /></button
-        >
-      </div>
+      <AudioList
+        title={i + 1 + ": " + recording.title}
+        audio={recording.audio}
+        on:deleterecording={() => deleteRecording(recording)}
+      />
     {/each}
   {:else}
     <div>Doesn't have any audio stored.</div>
@@ -118,20 +121,5 @@
     100% {
       color: darkred;
     }
-  }
-  .title {
-    text-align: end;
-    width: 200px;
-  }
-  .library {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    padding-bottom: 0.5rem;
-  }
-  .trash {
-    padding: 0.2rem;
-    border: none;
-    background-color: burlywood;
   }
 </style>
