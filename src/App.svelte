@@ -8,8 +8,6 @@
   let recordings = [];
 
   if (navigator.mediaDevices) {
-    console.log("getUserMedia supported.");
-
     navigator.mediaDevices
       .getUserMedia(constrains)
       .then((stream) => {
@@ -38,8 +36,6 @@
               audio: audioURL,
             },
           ];
-
-          console.log(recordings);
         };
       })
       .catch((err) => {
@@ -81,14 +77,11 @@
 
   {#if recordings.length > 0}
     {#each recordings as recording, i}
-      <div class="storage">
-        <span>{i + 1 + ": " + recording.title}</span>
+      <div class="library">
+        <span class="title">{i + 1 + ": " + recording.title}</span>
         <audio controls src={recording.audio} />
-        <Button
-          class="lixeira"
-          style="padding: 0px"
-          color=""
-          on:click={deleteRecording}><Icon name="trash-fill" /></Button
+        <button class="trash" on:click={deleteRecording(recording)}
+          ><Icon name="trash-fill" /></button
         >
       </div>
     {/each}
@@ -100,22 +93,21 @@
 <style>
   body {
     background-color: burlywood;
-    max-width: 45rem;
+    max-width: 35rem;
+    min-height: 9rem;
     margin: auto;
     text-align: center;
-    height: auto;
   }
-  .storage {
-    display: flex;
-    align-items: center;
-    justify-content: space-evenly;
-    margin: 0.5rem;
+  h1 {
+    margin: 0;
+  }
+  .buttons {
+    margin: 0.5rem 0;
   }
   .recording {
     font-weight: bold;
     animation: recorder 2s infinite;
   }
-
   @keyframes recorder {
     0% {
       color: darkred;
@@ -126,5 +118,20 @@
     100% {
       color: darkred;
     }
+  }
+  .title {
+    text-align: end;
+    width: 200px;
+  }
+  .library {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    padding-bottom: 0.5rem;
+  }
+  .trash {
+    padding: 0.2rem;
+    border: none;
+    background-color: burlywood;
   }
 </style>
